@@ -7,11 +7,14 @@ using Scene = UnityEngine.SceneManagement.Scene;
 
 public class GameManager : MonoBehaviour
 {
+    public GameObject mTitleScreen;
+
     private static GameManager mSingleton;
     private GroundPiece[] mGroundPieces;
 
     public void StartGame(int _difficulty)
     {
+        mTitleScreen.SetActive(false);
         return;
     }
 

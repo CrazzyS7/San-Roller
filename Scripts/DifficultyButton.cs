@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class DifficultyButtonX : MonoBehaviour
+public class DifficultyButton : MonoBehaviour
 {
-    private GameManager mGameManagerX;
+    private GameManager mGameManager;
     private Button mStartButton;
 
     public int mDifficulty;
@@ -13,7 +13,7 @@ public class DifficultyButtonX : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        mGameManagerX = GameObject.Find("GameManager").GetComponent<GameManager>();
+        mGameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         mStartButton = GetComponent<Button>();
         mStartButton.onClick.AddListener(SetDifficulty);
         return;
@@ -24,7 +24,7 @@ public class DifficultyButtonX : MonoBehaviour
     */
     public void SetDifficulty()
     {
-        mGameManagerX.StartGame(mDifficulty);
+        mGameManager.StartGame(mDifficulty);
         return;
     }
 }

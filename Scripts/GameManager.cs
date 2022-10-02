@@ -1,27 +1,83 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEditor.SearchService;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Scene = UnityEngine.SceneManagement.Scene;
+using System.Runtime.CompilerServices;
 
 public class GameManager : MonoBehaviour
 {
+    public TextMeshProUGUI mHiScoreText;
+    public TextMeshProUGUI mScoreText;
+    public TextMeshProUGUI mTimerText;
+    public GameObject mCreditScreen;
     public GameObject mTitleScreen;
+    public GameObject mScoreBoard;
+    public Button mRestartButton;
+    public Button mExitButton;
 
     private static GameManager mSingleton;
     private GroundPiece[] mGroundPieces;
+    private bool mIsGameOver = false;
+    private int mTimer = 0;
+    private int mScore = 0;
 
     public void StartGame(int _difficulty)
     {
         mTitleScreen.SetActive(false);
+        mScoreBoard.SetActive(true);
+        mScore = 0;
+
+        if (_difficulty < 0 )
+        {
+            UpdateScore(mScore);
+        }
+        else if(_difficulty > 0)
+        {
+            mTimer = 15;
+            UpdateScore(mScore);
+            StartCoroutine(TimerCounter());
+        }
+        else
+        {
+            mTimer = 30;
+            UpdateScore(mScore);
+            StartCoroutine(TimerCounter());
+        }
         return;
     }
 
-    public static GameManager GameManagerSingleton
+    public void UpdateScore(int _score)
     {
-        get { return mSingleton; }
+        mScore += _score;
+        mScoreText.text = "SCORE: " + mScore;
+        return;
     }
+
+    private void UpdateTimer()
+    {
+        mTimer--;
+        mTimerText.text = "Timer: " + mTimer;
+
+        if (mTimer <= 0)
+        {
+            GameOver();
+        }
+        return;
+    }
+
+    public void GameOver()
+    {
+        mCreditScreen.SetActive(true);
+        mIsGameOver = true;
+        return;
+    }
+
+    public static GameManager GameManagerSingleton => mSingleton;
+    
 
     private void Start()
     {
@@ -85,5 +141,14 @@ public class GameManager : MonoBehaviour
     {
         SetupNewLevel();
         return;
+    }
+
+    IEnumerator TimerCounter()
+    {
+        while (!mIsGameOver)
+        {
+            yield return new WaitForSeconds(1);
+            UpdateTimer();
+        }
     }
 }

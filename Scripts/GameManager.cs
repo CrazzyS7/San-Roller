@@ -10,8 +10,8 @@ using System.Runtime.CompilerServices;
 
 public class GameManager : MonoBehaviour
 {
-    public TextMeshProUGUI mHiScoreText;
-    public TextMeshProUGUI mScoreText;
+    public TextMeshProUGUI mGameOverText;
+    public TextMeshProUGUI mCompleteText;
     public TextMeshProUGUI mTimerText;
     public GameObject mCreditScreen;
     public GameObject mTitleScreen;
@@ -21,48 +21,48 @@ public class GameManager : MonoBehaviour
 
     private static GameManager mSingleton;
     private GroundPiece[] mGroundPieces;
-    private bool mIsGameOver = false;
+    private readonly int mScore = 0;
+    private int mDifficulty = -1;
     private int mTimer = 0;
-    private int mScore = 0;
+
+    // Properties
+    public bool IsGameOver
+    { get; set; }
 
     public void StartGame(int _difficulty)
     {
         mTitleScreen.SetActive(false);
-        mScoreBoard.SetActive(true);
-        mScore = 0;
+        mDifficulty = _difficulty;
 
         if (_difficulty < 0 )
         {
-            UpdateScore(mScore);
+            ScoreManager.ScoreManagerSingleton.UpdateScore = mScore;
+            mTimerText.text = "TIME: UNLIMITED";
+            mScoreBoard.SetActive(true);
         }
         else if(_difficulty > 0)
         {
-            mTimer = 15;
-            UpdateScore(mScore);
+            mTimer = 10;
+            mScoreBoard.SetActive(true);
+            ScoreManager.ScoreManagerSingleton.UpdateScore = mScore;
             StartCoroutine(TimerCounter());
         }
         else
         {
-            mTimer = 30;
-            UpdateScore(mScore);
+            mTimer = 15;
+            mScoreBoard.SetActive(true);
+            ScoreManager.ScoreManagerSingleton.UpdateScore = mScore;
             StartCoroutine(TimerCounter());
         }
-        return;
-    }
-
-    public void UpdateScore(int _score)
-    {
-        mScore += _score;
-        mScoreText.text = "SCORE: " + mScore;
         return;
     }
 
     private void UpdateTimer()
     {
         mTimer--;
-        mTimerText.text = "Timer: " + mTimer;
+        mTimerText.text = "TIME: " + mTimer;
 
-        if (mTimer <= 0)
+        if (mTimer < 0)
         {
             GameOver();
         }
@@ -71,8 +71,19 @@ public class GameManager : MonoBehaviour
 
     public void GameOver()
     {
+        mGameOverText.gameObject.SetActive(true);
         mCreditScreen.SetActive(true);
-        mIsGameOver = true;
+        mScoreBoard.SetActive(false);
+        IsGameOver = true;
+        return;
+    }
+
+    public void GameComplete()
+    {
+        mCompleteText.gameObject.SetActive(true);
+        mCreditScreen.SetActive(true);
+        mScoreBoard.SetActive(false);
+        IsGameOver = true;
         return;
     }
 
@@ -81,6 +92,7 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        IsGameOver = true;
         SetupNewLevel();
         return;
     }
@@ -118,6 +130,7 @@ public class GameManager : MonoBehaviour
         {
             if(!mGroundPieces[i].IsColored)
             {
+                ScoreManager.ScoreManagerSingleton.UpdateScores();
                 isFinished = false;
                 break;
             }
@@ -125,15 +138,37 @@ public class GameManager : MonoBehaviour
 
         if(isFinished)
         {
-            NextLevel();
+            if(mDifficulty < 0)
+            {
+                NextLevel();
+            }
+            else if(mDifficulty > 0)
+            {
+                int score = mTimer * 10;
+                ScoreManager.ScoreManagerSingleton.TimeScore(score);
+                NextLevel();
+            }
+            else
+            {
+                int score = mTimer * 3;
+                ScoreManager.ScoreManagerSingleton.TimeScore(score);
+                NextLevel();
+            }
         }
         return;
     }
 
     private void NextLevel()
     {
-        int level = (SceneManager.GetActiveScene().buildIndex >= 1) ? 0 : SceneManager.GetActiveScene().buildIndex + 1;
-        SceneManager.LoadScene(level);
+        if(SceneManager.GetActiveScene().buildIndex >= 1)
+        {
+            GameComplete();
+        }
+        else
+        {
+            int level = SceneManager.GetActiveScene().buildIndex + 1;
+            SceneManager.LoadScene(level);
+        }
         return;
     }
 
@@ -145,7 +180,7 @@ public class GameManager : MonoBehaviour
 
     IEnumerator TimerCounter()
     {
-        while (!mIsGameOver)
+        while (!IsGameOver)
         {
             yield return new WaitForSeconds(1);
             UpdateTimer();

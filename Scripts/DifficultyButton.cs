@@ -24,6 +24,7 @@ public class DifficultyButton : MonoBehaviour
     */
     public void SetDifficulty()
     {
+        mGameManager.IsGameOver = false;
         mGameManager.StartGame(mDifficulty);
         return;
     }

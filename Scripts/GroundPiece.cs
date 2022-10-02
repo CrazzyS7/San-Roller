@@ -8,8 +8,8 @@ public class GroundPiece : MonoBehaviour
 
     public bool IsColored
     {
-        get { return this.mIsColored; }
-        set { this.mIsColored = value; }
+        get { return mIsColored; }
+        set { mIsColored = value; }
     }
 
     public void ChangeColor(Color _color)

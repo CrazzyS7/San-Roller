@@ -12,12 +12,14 @@ public class PlayerController : MonoBehaviour
     private Vector3 mTravelDir = Vector3.zero;
     private readonly float mSpeed = 15.0f;
     private readonly int mMinSwipe = 200;
+    private GameManager mGameManager;
     private bool mIsMoving = false;
     private Rigidbody mPlayerRB;
     private Color mSolveColor;
 
     private void Start()
     {
+        mGameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         mSolveColor = Random.ColorHSV(0.7f, 1);
         GetComponent<MeshRenderer>().material.color = mSolveColor;
         mPlayerRB = GetComponent<Rigidbody>();
@@ -58,31 +60,34 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        if (Input.GetMouseButton(0))
+        if(!mGameManager.IsGameOver)
         {
-            mSwipePosCurrentFrame = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
-            if (mSwipePosLastFrame != Vector2.zero)
+            if (Input.GetMouseButton(0))
             {
-                mCurrentSwipe = mSwipePosCurrentFrame - mSwipePosLastFrame;
-                if(mCurrentSwipe.sqrMagnitude < mMinSwipe)
+                mSwipePosCurrentFrame = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+                if (mSwipePosLastFrame != Vector2.zero)
                 {
-                    return;
-                }
+                    mCurrentSwipe = mSwipePosCurrentFrame - mSwipePosLastFrame;
+                    if (mCurrentSwipe.sqrMagnitude < mMinSwipe)
+                    {
+                        return;
+                    }
 
-                mCurrentSwipe.Normalize();
-                if(mCurrentSwipe.x > -0.5f && mCurrentSwipe.x < 0.5)
-                {
-                    //Up or Down
-                    SetDestination(mCurrentSwipe.y > 0 ? Vector3.forward : Vector3.back);
-                }
+                    mCurrentSwipe.Normalize();
+                    if (mCurrentSwipe.x > -0.5f && mCurrentSwipe.x < 0.5)
+                    {
+                        //Up or Down
+                        SetDestination(mCurrentSwipe.y > 0 ? Vector3.forward : Vector3.back);
+                    }
 
-                if(mCurrentSwipe.y > -0.5 && mCurrentSwipe.y < 0.5)
-                {
-                    //Left or Right
-                    SetDestination(mCurrentSwipe.x > 0 ? Vector3.right : Vector3.left);
+                    if (mCurrentSwipe.y > -0.5 && mCurrentSwipe.y < 0.5)
+                    {
+                        //Left or Right
+                        SetDestination(mCurrentSwipe.x > 0 ? Vector3.right : Vector3.left);
+                    }
                 }
+                mSwipePosLastFrame = mSwipePosCurrentFrame;
             }
-            mSwipePosLastFrame = mSwipePosCurrentFrame;
         }
 
         if(Input.GetMouseButtonUp(0))

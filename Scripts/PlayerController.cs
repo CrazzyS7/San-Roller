@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    public ParticleSystem mSmokePtcl;
+
+    private Vector3 mSmokePtclOffset = new Vector3(0, 1.0f, 0);
     private Vector3 mNextCollisionPosition = Vector3.zero;
     private Vector2 mSwipePosCurrentFrame = Vector2.zero;
     private Vector2 mSwipePosLastFrame = Vector2.zero;
@@ -28,8 +31,12 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if(mIsMoving)
+        Vector3 playerPos = transform.position;
+        mSmokePtcl.transform.position = playerPos - mSmokePtclOffset;
+
+        if (mIsMoving)
         {
+            mSmokePtcl.Play();
             mPlayerRB.velocity = mTravelDir * mSpeed;
         }
 
@@ -60,7 +67,9 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        if(!mGameManager.IsGameOver)
+        mSmokePtcl.Stop();
+
+        if (!mGameManager.IsGameOver)
         {
             if (Input.GetMouseButton(0))
             {

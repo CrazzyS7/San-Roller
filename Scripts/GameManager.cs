@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Scene = UnityEngine.SceneManagement.Scene;
-using System.Runtime.CompilerServices;
+using System;
 
 public class GameManager : MonoBehaviour
 {
@@ -21,9 +21,10 @@ public class GameManager : MonoBehaviour
 
     private static GameManager mSingleton;
     private GroundPiece[] mGroundPieces;
-    private readonly int mScore = 0;
     private int mDifficulty = -1;
     private int mTimer = 0;
+
+    public static GameManager GameManagerSingleton => mSingleton;
 
     // Properties
     public bool IsGameOver
@@ -36,7 +37,6 @@ public class GameManager : MonoBehaviour
 
         if (_difficulty < 0 )
         {
-            ScoreManager.ScoreManagerSingleton.UpdateScore = mScore;
             mTimerText.text = "TIME: UNLIMITED";
             mScoreBoard.SetActive(true);
         }
@@ -44,16 +44,21 @@ public class GameManager : MonoBehaviour
         {
             mTimer = 10;
             mScoreBoard.SetActive(true);
-            ScoreManager.ScoreManagerSingleton.UpdateScore = mScore;
             StartCoroutine(TimerCounter());
         }
         else
         {
             mTimer = 15;
             mScoreBoard.SetActive(true);
-            ScoreManager.ScoreManagerSingleton.UpdateScore = mScore;
             StartCoroutine(TimerCounter());
         }
+        ScoreManager.ScoreManagerSingleton.LoadScore();
+        return;
+    }
+
+    public void RestartGame()
+    {
+        SceneManager.LoadScene(0);
         return;
     }
 
@@ -72,6 +77,8 @@ public class GameManager : MonoBehaviour
     public void GameOver()
     {
         mGameOverText.gameObject.SetActive(true);
+        PlayerPrefs.DeleteKey("playerScore");
+        PlayerPrefs.DeleteKey("gameState");
         mCreditScreen.SetActive(true);
         mScoreBoard.SetActive(false);
         IsGameOver = true;
@@ -81,18 +88,17 @@ public class GameManager : MonoBehaviour
     public void GameComplete()
     {
         mCompleteText.gameObject.SetActive(true);
+        PlayerPrefs.DeleteKey("playerScore");
+        PlayerPrefs.DeleteKey("gameState");
         mCreditScreen.SetActive(true);
         mScoreBoard.SetActive(false);
         IsGameOver = true;
         return;
     }
-
-    public static GameManager GameManagerSingleton => mSingleton;
     
-
     private void Start()
     {
-        IsGameOver = true;
+        SetGameState();
         SetupNewLevel();
         return;
     }
@@ -160,6 +166,8 @@ public class GameManager : MonoBehaviour
 
     private void NextLevel()
     {
+        PlayerPrefs.SetInt("gameState", 1);
+        ScoreManager.ScoreManagerSingleton.SaveScore();
         if(SceneManager.GetActiveScene().buildIndex >= 1)
         {
             GameComplete();
@@ -175,6 +183,19 @@ public class GameManager : MonoBehaviour
     private void OnLevelFinished(Scene _scene, LoadSceneMode _mode)
     {
         SetupNewLevel();
+        return;
+    }
+
+    private void SetGameState()
+    {
+        if(PlayerPrefs.HasKey("gameState"))
+        {
+            IsGameOver = false;
+        }
+        else
+        {
+            IsGameOver = true;
+        }
         return;
     }
 

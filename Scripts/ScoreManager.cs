@@ -13,17 +13,21 @@ public class ScoreManager : MonoBehaviour
     private static ScoreManager mSingleton;
     private readonly int mScorePoints = 2;
     private int mHiScore = 0;
-    private int mScore = 0;
+    //private int mScore = 0;
 
     public static ScoreManager ScoreManagerSingleton => mSingleton;
+
+    public int Score
+    { get; set; }
 
     private void Start()
     {
         if(PlayerPrefs.HasKey("highScore"))
         {
             mHiScore = PlayerPrefs.GetInt("highScore");
-            mHiScoreText.text = "HI-SCORE: " + mHiScore;
+            mHiScoreText.text = "HI-SCORE: " + Score;
         }
+        LoadScore();
         return;
     }
 
@@ -41,42 +45,57 @@ public class ScoreManager : MonoBehaviour
         return;
     }
 
-    public int UpdateScore
-    {
-        get { return mScore; }
-        set { mScore = value; }
-    }
-
     public void UpdateScores()
     {
-        UpdateScore += mScorePoints;
+        Score += mScorePoints;
         UpdateScoreText();
         return;
     }
 
     public void TimeScore(int _score)
     {
-        mScore += _score;
+        Score += _score;
         UpdateScoreText();
         return;
     }
 
     private void UpdateScoreText()
     {
-        if (mScore > mHiScore)
+        if (Score > mHiScore)
         {
-            mHiScore = mScore;
-            PlayerPrefs.SetInt("highScore", mHiScore);
+            mHiScore = Score;
         }
-        mScoreText.text = "SCORE: " + mScore;
+        mScoreText.text = "SCORE: " + Score;
         mHiScoreText.text = "HI-SCORE: " + mHiScore;
-        mFinalScoreText.text = "YOUR SCORE: " + mScore;
+        mFinalScoreText.text = "YOUR SCORE: " + Score;
+        return;
+    }
+
+    public void LoadScore()
+    {
+        if(PlayerPrefs.HasKey("playerScore"))
+        {
+            Score = PlayerPrefs.GetInt("playerScore");
+            Debug.Log("Player score loaded");
+        }
+        else
+        {
+            Score = 0;
+            Debug.Log("Player score reset");
+        }
+        return;
+    }
+
+    public void SaveScore()
+    {
+        PlayerPrefs.SetInt("highScore", mHiScore);
+        PlayerPrefs.SetInt("playerScore", Score);
         return;
     }
 
     public void ResetScore()
     {
-        mScore = 0;
+        Score = 0;
         return;
     }
 }

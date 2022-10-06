@@ -4,9 +4,6 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public ParticleSystem mSmokePtcl;
-
-    private Vector3 mSmokePtclOffset = new Vector3(0, 1.0f, 0);
     private Vector3 mNextCollisionPosition = Vector3.zero;
     private Vector2 mSwipePosCurrentFrame = Vector2.zero;
     private Vector2 mSwipePosLastFrame = Vector2.zero;
@@ -14,29 +11,29 @@ public class PlayerController : MonoBehaviour
     private readonly float mMaxDistance = 100.0f;
     private Vector3 mTravelDir = Vector3.zero;
     private readonly float mSpeed = 15.0f;
-    private readonly int mMinSwipe = 200;
+    private readonly int mMinSwipe = 500;
     private GameManager mGameManager;
     private bool mIsMoving = false;
+    private AudioSource mPlayAudio;
     private Rigidbody mPlayerRB;
     private Color mSolveColor;
+
+    public AudioClip mSwipeSFX;
 
     private void Start()
     {
         mGameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
-        mSolveColor = Random.ColorHSV(0.7f, 1);
+        mSolveColor = Random.ColorHSV(0.6f, 1);
         GetComponent<MeshRenderer>().material.color = mSolveColor;
         mPlayerRB = GetComponent<Rigidbody>();
+        mPlayAudio = GetComponent<AudioSource>();
         return;
     }
 
     private void FixedUpdate()
     {
-        Vector3 playerPos = transform.position;
-        mSmokePtcl.transform.position = playerPos - mSmokePtclOffset;
-
         if (mIsMoving)
         {
-            mSmokePtcl.Play();
             mPlayerRB.velocity = mTravelDir * mSpeed;
         }
 
@@ -67,8 +64,6 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        mSmokePtcl.Stop();
-
         if (!mGameManager.IsGameOver)
         {
             if (Input.GetMouseButton(0))
@@ -83,6 +78,8 @@ public class PlayerController : MonoBehaviour
                     }
 
                     mCurrentSwipe.Normalize();
+                    mPlayAudio.PlayOneShot(mSwipeSFX, 1.0f);
+
                     if (mCurrentSwipe.x > -0.5f && mCurrentSwipe.x < 0.5)
                     {
                         //Up or Down

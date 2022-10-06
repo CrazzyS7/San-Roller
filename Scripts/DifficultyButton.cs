@@ -20,7 +20,7 @@ public class DifficultyButton : MonoBehaviour
     }
 
     /* When a button is clicked, call the StartGame() method
-     * and pass it the difficulty value (1, 2, 3) from the button 
+     * and pass it the difficulty value (-1, 0, 1) from the button 
     */
     public void SetDifficulty()
     {

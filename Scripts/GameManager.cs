@@ -1,12 +1,12 @@
 using System.Collections;
-using System.Collections.Generic;
+//using System.Collections.Generic;
 using TMPro;
-using UnityEditor.SearchService;
+//using UnityEditor.SearchService;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Scene = UnityEngine.SceneManagement.Scene;
-using System;
+//using System;
 
 public class GameManager : MonoBehaviour
 {
@@ -29,6 +29,18 @@ public class GameManager : MonoBehaviour
     // Properties
     public bool IsGameOver
     { get; set; }
+
+    private void Start()
+    {
+        if(PlayerPrefs.HasKey("continue"))
+        {
+            int difficulty = PlayerPrefs.GetInt("continue");
+            StartGame(difficulty);
+            IsGameOver = false;
+        }
+        SetupNewLevel();
+        return;
+    }
 
     public void StartGame(int _difficulty)
     {
@@ -77,29 +89,24 @@ public class GameManager : MonoBehaviour
     public void GameOver()
     {
         mGameOverText.gameObject.SetActive(true);
-        PlayerPrefs.DeleteKey("playerScore");
-        PlayerPrefs.DeleteKey("gameState");
-        mCreditScreen.SetActive(true);
-        mScoreBoard.SetActive(false);
-        IsGameOver = true;
+        GameCom();
         return;
     }
 
     public void GameComplete()
     {
         mCompleteText.gameObject.SetActive(true);
+        GameCom();
+        return;
+    }
+
+    private void GameCom()
+    {
         PlayerPrefs.DeleteKey("playerScore");
-        PlayerPrefs.DeleteKey("gameState");
+        PlayerPrefs.DeleteKey("continue");
         mCreditScreen.SetActive(true);
         mScoreBoard.SetActive(false);
         IsGameOver = true;
-        return;
-    }
-    
-    private void Start()
-    {
-        SetGameState();
-        SetupNewLevel();
         return;
     }
 
@@ -166,7 +173,7 @@ public class GameManager : MonoBehaviour
 
     private void NextLevel()
     {
-        PlayerPrefs.SetInt("gameState", 1);
+        PlayerPrefs.SetInt("continue", mDifficulty);
         ScoreManager.ScoreManagerSingleton.SaveScore();
         if(SceneManager.GetActiveScene().buildIndex >= 1)
         {
@@ -183,19 +190,6 @@ public class GameManager : MonoBehaviour
     private void OnLevelFinished(Scene _scene, LoadSceneMode _mode)
     {
         SetupNewLevel();
-        return;
-    }
-
-    private void SetGameState()
-    {
-        if(PlayerPrefs.HasKey("gameState"))
-        {
-            IsGameOver = false;
-        }
-        else
-        {
-            IsGameOver = true;
-        }
         return;
     }
 

@@ -1,6 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine.UI;
+//using System.Collections;
+//using System.Collections.Generic;
+//using UnityEngine.UI;
 using UnityEngine;
 using TMPro;
 
@@ -11,10 +11,8 @@ public class ScoreManager : MonoBehaviour
     public TextMeshProUGUI mScoreText;
 
     private static ScoreManager mSingleton;
-    private readonly int mScorePoints = 2;
+    private readonly int mScorePoints = 3;
     private int mHiScore = 0;
-    //private int mScore = 0;
-
     public static ScoreManager ScoreManagerSingleton => mSingleton;
 
     public int Score

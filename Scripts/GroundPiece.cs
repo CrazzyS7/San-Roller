@@ -1,21 +1,16 @@
-//using System.Collections;
-//using System.Collections.Generic;
+using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 
 public class GroundPiece : MonoBehaviour
 {
-    private bool mIsColored = false;
-
     public bool IsColored
-    {
-        get { return mIsColored; }
-        set { mIsColored = value; }
-    }
+    { get; set; }
 
     public void ChangeColor(Color _color)
     {
         GetComponent<MeshRenderer>().material.color = _color;
-        mIsColored = true;
+        IsColored = true;
         GameManager.GameManagerSingleton.CheckComplete();
         return;
     }

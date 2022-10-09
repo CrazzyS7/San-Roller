@@ -1,6 +1,6 @@
-//using System.Collections;
-//using System.Collections.Generic;
-//using UnityEngine.UI;
+using System.Collections.Generic;
+using System.Collections;
+using UnityEngine.UI;
 using UnityEngine;
 using TMPro;
 
@@ -13,6 +13,7 @@ public class ScoreManager : MonoBehaviour
     private static ScoreManager mSingleton;
     private readonly int mScorePoints = 3;
     private int mHiScore = 0;
+
     public static ScoreManager ScoreManagerSingleton => mSingleton;
 
     public int Score
@@ -23,7 +24,7 @@ public class ScoreManager : MonoBehaviour
         if(PlayerPrefs.HasKey("highScore"))
         {
             mHiScore = PlayerPrefs.GetInt("highScore");
-            mHiScoreText.text = "HI-SCORE: " + Score;
+            mHiScoreText.text = "HI-SCORE: " + mHiScore;
         }
         LoadScore();
         return;
@@ -74,12 +75,10 @@ public class ScoreManager : MonoBehaviour
         if(PlayerPrefs.HasKey("playerScore"))
         {
             Score = PlayerPrefs.GetInt("playerScore");
-            Debug.Log("Player score loaded");
         }
         else
         {
             Score = 0;
-            Debug.Log("Player score reset");
         }
         return;
     }

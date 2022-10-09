@@ -1,7 +1,7 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
+using System.Collections;
 using UnityEngine.UI;
+using UnityEngine;
 
 public class DifficultyButton : MonoBehaviour
 {
@@ -24,8 +24,8 @@ public class DifficultyButton : MonoBehaviour
     */
     public void SetDifficulty()
     {
-        mGameManager.IsGameOver = false;
         mGameManager.StartGame(mDifficulty);
+        mGameManager.IsGameOver = false;
         return;
     }
 }

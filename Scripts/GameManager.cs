@@ -1,12 +1,10 @@
-using System.Collections;
-//using System.Collections.Generic;
-using TMPro;
-//using UnityEditor.SearchService;
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 using Scene = UnityEngine.SceneManagement.Scene;
-//using System;
+using UnityEngine.SceneManagement;
+using System.Collections.Generic;
+using System.Collections;
+using UnityEngine;
+using System;
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
@@ -16,11 +14,10 @@ public class GameManager : MonoBehaviour
     public GameObject mCreditScreen;
     public GameObject mTitleScreen;
     public GameObject mScoreBoard;
-    public Button mRestartButton;
-    public Button mExitButton;
 
     private static GameManager mSingleton;
     private GroundPiece[] mGroundPieces;
+    private readonly int mNumScenes = 3;
     private int mDifficulty = -1;
     private int mTimer = 0;
 
@@ -38,6 +35,10 @@ public class GameManager : MonoBehaviour
             StartGame(difficulty);
             IsGameOver = false;
         }
+        else
+        {
+            IsGameOver  = true;
+        }
         SetupNewLevel();
         return;
     }
@@ -45,23 +46,25 @@ public class GameManager : MonoBehaviour
     public void StartGame(int _difficulty)
     {
         mTitleScreen.SetActive(false);
+        mScoreBoard.SetActive(true);
         mDifficulty = _difficulty;
+        IsGameOver = false;
 
         if (_difficulty < 0 )
         {
             mTimerText.text = "TIME: UNLIMITED";
-            mScoreBoard.SetActive(true);
+            
         }
         else if(_difficulty > 0)
         {
             mTimer = 10;
-            mScoreBoard.SetActive(true);
+            mTimerText.text = "TIME: " + mTimer;
             StartCoroutine(TimerCounter());
         }
         else
         {
             mTimer = 15;
-            mScoreBoard.SetActive(true);
+            mTimerText.text = "TIME: " + mTimer;
             StartCoroutine(TimerCounter());
         }
         ScoreManager.ScoreManagerSingleton.LoadScore();
@@ -72,6 +75,11 @@ public class GameManager : MonoBehaviour
     {
         SceneManager.LoadScene(0);
         return;
+    }
+
+    public void QuitGame()
+    {
+        Application.Quit();
     }
 
     private void UpdateTimer()
@@ -139,11 +147,10 @@ public class GameManager : MonoBehaviour
     public void CheckComplete()
     {
         bool isFinished = true;
-        for(int i = 0; i < mGroundPieces.Length; i++)
+        foreach(GroundPiece piece in mGroundPieces)
         {
-            if(!mGroundPieces[i].IsColored)
+            if(!piece.IsColored)
             {
-                ScoreManager.ScoreManagerSingleton.UpdateScores();
                 isFinished = false;
                 break;
             }
@@ -151,22 +158,17 @@ public class GameManager : MonoBehaviour
 
         if(isFinished)
         {
-            if(mDifficulty < 0)
-            {
-                NextLevel();
-            }
-            else if(mDifficulty > 0)
+            if(mDifficulty > 0)
             {
                 int score = mTimer * 10;
                 ScoreManager.ScoreManagerSingleton.TimeScore(score);
-                NextLevel();
             }
-            else
+            else if (mDifficulty == 0)
             {
                 int score = mTimer * 3;
                 ScoreManager.ScoreManagerSingleton.TimeScore(score);
-                NextLevel();
             }
+            NextLevel();
         }
         return;
     }
@@ -175,7 +177,8 @@ public class GameManager : MonoBehaviour
     {
         PlayerPrefs.SetInt("continue", mDifficulty);
         ScoreManager.ScoreManagerSingleton.SaveScore();
-        if(SceneManager.GetActiveScene().buildIndex >= 1)
+        
+        if (SceneManager.GetActiveScene().buildIndex >= mNumScenes)
         {
             GameComplete();
         }
@@ -195,6 +198,7 @@ public class GameManager : MonoBehaviour
 
     IEnumerator TimerCounter()
     {
+        
         while (!IsGameOver)
         {
             yield return new WaitForSeconds(1);

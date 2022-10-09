@@ -1,5 +1,5 @@
-using System.Collections;
 using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -25,8 +25,8 @@ public class PlayerController : MonoBehaviour
         mGameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         mSolveColor = Random.ColorHSV(0.6f, 1);
         GetComponent<MeshRenderer>().material.color = mSolveColor;
-        mPlayerRB = GetComponent<Rigidbody>();
         mPlayAudio = GetComponent<AudioSource>();
+        mPlayerRB = GetComponent<Rigidbody>();
         return;
     }
 
@@ -44,6 +44,7 @@ public class PlayerController : MonoBehaviour
             GroundPiece ground = hitColliders[iter].transform.GetComponent<GroundPiece>();
             if(ground && !ground.IsColored)
             {
+                ScoreManager.ScoreManagerSingleton.UpdateScores();
                 ground.ChangeColor(mSolveColor);
             }
             iter++;
@@ -53,9 +54,9 @@ public class PlayerController : MonoBehaviour
         {
             if(Vector3.Distance(transform.position, mNextCollisionPosition) < 1)
             {
-                mIsMoving = false;
-                mTravelDir = Vector3.zero;
                 mNextCollisionPosition = Vector3.zero;
+                mTravelDir = Vector3.zero;
+                mIsMoving = false;
             }
         }
         
@@ -77,8 +78,8 @@ public class PlayerController : MonoBehaviour
                         return;
                     }
 
-                    mCurrentSwipe.Normalize();
                     mPlayAudio.PlayOneShot(mSwipeSFX, 1.0f);
+                    mCurrentSwipe.Normalize();
 
                     if (mCurrentSwipe.x > -0.5f && mCurrentSwipe.x < 0.5)
                     {

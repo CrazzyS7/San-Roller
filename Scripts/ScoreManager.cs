@@ -26,7 +26,7 @@ public class ScoreManager : MonoBehaviour
             mHiScore = PlayerPrefs.GetInt("highScore");
             mHiScoreText.text = "HI-SCORE: " + mHiScore;
         }
-        LoadScore();
+        //LoadScore();
         return;
     }
 
@@ -75,6 +75,7 @@ public class ScoreManager : MonoBehaviour
         if(PlayerPrefs.HasKey("playerScore"))
         {
             Score = PlayerPrefs.GetInt("playerScore");
+            PlayerPrefs.DeleteKey("playerScore");
         }
         else
         {

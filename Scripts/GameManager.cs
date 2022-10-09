@@ -32,6 +32,7 @@ public class GameManager : MonoBehaviour
         if(PlayerPrefs.HasKey("continue"))
         {
             int difficulty = PlayerPrefs.GetInt("continue");
+            PlayerPrefs.DeleteKey("continue");
             StartGame(difficulty);
             IsGameOver = false;
         }
@@ -73,13 +74,14 @@ public class GameManager : MonoBehaviour
 
     public void RestartGame()
     {
-        SceneManager.LoadScene(0);
+        SceneManager.LoadScene(1);
         return;
     }
 
     public void QuitGame()
     {
-        Application.Quit();
+        SceneManager.LoadScene(0);
+        return;
     }
 
     private void UpdateTimer()
